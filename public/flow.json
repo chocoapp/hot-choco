@@ -1,0 +1,196 @@
+{
+  "nodes": [
+    {
+      "id": "login_page",
+      "type": "circularNode",
+      "data": {
+        "label": "Phone Login",
+        "url": "https://web.spezi.app/login",
+        "role": "admin",
+        "description": "Phone number login screen for all user types",
+        "actions": ["Enter phone number", "Select country code", "Submit login"],
+        "prerequisites": ["Valid phone number"],
+        "screenshot": "login_phone_input"
+      }
+    },
+    {
+      "id": "email_login_page",
+      "type": "circularNode",
+      "data": {
+        "label": "Email Login",
+        "url": "https://web.spezi.app/login",
+        "role": "admin",
+        "description": "Email login screen as alternative to phone login",
+        "actions": ["Enter email address", "Submit login"],
+        "prerequisites": ["Valid email address"],
+        "screenshot": "login_email_input"
+      }
+    },
+    {
+      "id": "email_verification",
+      "type": "circularNode",
+      "data": {
+        "label": "Email Verification",
+        "url": "https://web.spezi.app/sessions/two-factor",
+        "role": "admin",
+        "description": "Email verification code entry screen",
+        "actions": ["Enter verification code", "Request new code"],
+        "prerequisites": ["Email submitted", "Code received"],
+        "screenshot": "email_verification"
+      }
+    },
+    {
+      "id": "code_verification",
+      "type": "circularNode",
+      "data": {
+        "label": "Code Verification",
+        "url": "https://web.spezi.app/sessions/two-factor",
+        "role": "admin",
+        "description": "Two-factor authentication code entry screen",
+        "actions": ["Enter verification code", "Request new code"],
+        "prerequisites": ["Phone number submitted", "Code received"],
+        "screenshot": "code_verification"
+      }
+    },
+    {
+      "id": "inbox",
+      "type": "circularNode",
+      "data": {
+        "label": "Inbox",
+        "url": "https://web.spezi.app/inbox/71f57227-b215-4199-8ab9-117534eaeb09",
+        "role": "buyer",
+        "description": "Main inbox showing chats with suppliers and recent orders",
+        "actions": ["Start order", "Edit order guide", "View order details"],
+        "prerequisites": ["Successful login"],
+        "screenshot": "buyer_inbox_home"
+      }
+    },
+    {
+      "id": "order_guide",
+      "type": "circularNode",
+      "data": {
+        "label": "Order Guide",
+        "url": "https://web.spezi.app/inbox/71f57227-b215-4199-8ab9-117534eaeb09/products",
+        "role": "buyer",
+        "description": "Product catalog with quantity selection",
+        "actions": ["Add products to cart", "Browse categories"],
+        "prerequisites": ["Products available"],
+        "screenshot": "order_guide_with_products"
+      }
+    },
+    {
+      "id": "shopping_cart",
+      "type": "circularNode",
+      "data": {
+        "label": "Shopping Cart",
+        "url": "https://web.spezi.app/inbox/71f57227-b215-4199-8ab9-117534eaeb09/products",
+        "role": "buyer",
+        "description": "Cart review with delivery date requirement and checkout",
+        "actions": ["Set delivery date", "Review cart", "Proceed to checkout"],
+        "prerequisites": ["Products in cart", "Delivery date required"],
+        "screenshot": "cart_with_products"
+      }
+    },
+    {
+      "id": "checkout",
+      "type": "circularNode",
+      "data": {
+        "label": "Checkout",
+        "url": "https://web.spezi.app/inbox/71f57227-b215-4199-8ab9-117534eaeb09/products",
+        "role": "buyer",
+        "description": "Final order review and submission",
+        "actions": ["Review order", "Add comments", "Submit order"],
+        "prerequisites": ["Products added", "Delivery date selected", "Submit enabled"],
+        "screenshot": "checkout_page"
+      }
+    },
+    {
+      "id": "confirmation",
+      "type": "circularNode",
+      "data": {
+        "label": "Confirmation",
+        "url": "https://web.spezi.app/inbox/71f57227-b215-4199-8ab9-117534eaeb09",
+        "role": "buyer",
+        "description": "Order completion confirmation",
+        "actions": ["Return to inbox"],
+        "prerequisites": ["Order submitted"],
+        "screenshot": "order_confirmation"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "login-to-code",
+      "source": "login_page",
+      "target": "code_verification",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Submit phone number"
+    },
+    {
+      "id": "code-to-inbox",
+      "source": "code_verification",
+      "target": "inbox",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Verify code"
+    },
+    {
+      "id": "inbox-to-order-guide",
+      "source": "inbox",
+      "target": "order_guide",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Start order"
+    },
+    {
+      "id": "order-guide-to-cart",
+      "source": "order_guide",
+      "target": "shopping_cart",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Add products → Cart"
+    },
+    {
+      "id": "cart-to-checkout",
+      "source": "shopping_cart",
+      "target": "checkout",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Go to checkout"
+    },
+    {
+      "id": "checkout-to-confirmation",
+      "source": "checkout",
+      "target": "confirmation",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Submit order"
+    },
+    {
+      "id": "confirmation-to-inbox",
+      "source": "confirmation",
+      "target": "inbox",
+      "type": "smoothstep",
+      "animated": false,
+      "label": "Return to inbox",
+      "style": { "strokeDasharray": "5,5", "stroke": "#999" }
+    },
+    {
+      "id": "email-login-to-verification",
+      "source": "email_login_page",
+      "target": "email_verification",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Submit email"
+    },
+    {
+      "id": "email-verification-to-inbox",
+      "source": "email_verification",
+      "target": "inbox",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Verify code"
+    }
+  ]
+}
