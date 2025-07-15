@@ -10,7 +10,16 @@
         "description": "Phone number login screen for all user types",
         "actions": ["Enter phone number", "Select country code", "Submit login"],
         "prerequisites": ["Valid phone number"],
-        "screenshot": "login_phone_input"
+        "screenshot": "login_phone_input",
+        "product": "authentication",
+        "section": "login",
+        "feature": "phone-login",
+        "qualityMetrics": {
+          "testCoverage": 85,
+          "bugCount": 2,
+          "riskLevel": "medium",
+          "lastUpdated": "2025-07-15T10:30:00Z"
+        }
       }
     },
     {
@@ -23,7 +32,16 @@
         "description": "Email login screen as alternative to phone login",
         "actions": ["Enter email address", "Submit login"],
         "prerequisites": ["Valid email address"],
-        "screenshot": "login_email_input"
+        "screenshot": "login_email_input",
+        "product": "authentication",
+        "section": "login",
+        "feature": "email-login",
+        "qualityMetrics": {
+          "testCoverage": 78,
+          "bugCount": 1,
+          "riskLevel": "low",
+          "lastUpdated": "2025-07-15T10:30:00Z"
+        }
       }
     },
     {
@@ -36,7 +54,16 @@
         "description": "Email verification code entry screen",
         "actions": ["Enter verification code", "Request new code"],
         "prerequisites": ["Email submitted", "Code received"],
-        "screenshot": "email_verification"
+        "screenshot": "email_verification",
+        "product": "authentication",
+        "section": "verification",
+        "feature": "email-verification",
+        "qualityMetrics": {
+          "testCoverage": 92,
+          "bugCount": 0,
+          "riskLevel": "low",
+          "lastUpdated": "2025-07-15T10:30:00Z"
+        }
       }
     },
     {
@@ -49,7 +76,16 @@
         "description": "Two-factor authentication code entry screen",
         "actions": ["Enter verification code", "Request new code"],
         "prerequisites": ["Phone number submitted", "Code received"],
-        "screenshot": "code_verification"
+        "screenshot": "code_verification",
+        "product": "authentication",
+        "section": "verification",
+        "feature": "sms-verification",
+        "qualityMetrics": {
+          "testCoverage": 88,
+          "bugCount": 1,
+          "riskLevel": "low",
+          "lastUpdated": "2025-07-15T10:30:00Z"
+        }
       }
     },
     {
@@ -62,7 +98,16 @@
         "description": "Main inbox showing chats with suppliers and recent orders",
         "actions": ["Start order", "Edit order guide", "View order details"],
         "prerequisites": ["Successful login"],
-        "screenshot": "buyer_inbox_home"
+        "screenshot": "buyer_inbox_home",
+        "product": "ordering-system",
+        "section": "dashboard",
+        "feature": "inbox",
+        "qualityMetrics": {
+          "testCoverage": 95,
+          "bugCount": 0,
+          "riskLevel": "low",
+          "lastUpdated": "2025-07-15T10:30:00Z"
+        }
       }
     },
     {
@@ -75,7 +120,16 @@
         "description": "Product catalog with quantity selection",
         "actions": ["Add products to cart", "Browse categories"],
         "prerequisites": ["Products available"],
-        "screenshot": "order_guide_with_products"
+        "screenshot": "order_guide_with_products",
+        "product": "ordering-system",
+        "section": "catalog",
+        "feature": "product-browsing",
+        "qualityMetrics": {
+          "testCoverage": 72,
+          "bugCount": 3,
+          "riskLevel": "high",
+          "lastUpdated": "2025-07-15T10:30:00Z"
+        }
       }
     },
     {
@@ -88,7 +142,16 @@
         "description": "Cart review with delivery date requirement and checkout",
         "actions": ["Set delivery date", "Review cart", "Proceed to checkout"],
         "prerequisites": ["Products in cart", "Delivery date required"],
-        "screenshot": "cart_with_products"
+        "screenshot": "cart_with_products",
+        "product": "ordering-system",
+        "section": "cart",
+        "feature": "cart-management",
+        "qualityMetrics": {
+          "testCoverage": 80,
+          "bugCount": 2,
+          "riskLevel": "medium",
+          "lastUpdated": "2025-07-15T10:30:00Z"
+        }
       }
     },
     {
@@ -101,7 +164,16 @@
         "description": "Final order review and submission",
         "actions": ["Review order", "Add comments", "Submit order"],
         "prerequisites": ["Products added", "Delivery date selected", "Submit enabled"],
-        "screenshot": "checkout_page"
+        "screenshot": "checkout_page",
+        "product": "ordering-system",
+        "section": "checkout",
+        "feature": "order-submission",
+        "qualityMetrics": {
+          "testCoverage": 65,
+          "bugCount": 4,
+          "riskLevel": "high",
+          "lastUpdated": "2025-07-15T10:30:00Z"
+        }
       }
     },
     {
@@ -114,7 +186,16 @@
         "description": "Order completion confirmation",
         "actions": ["Return to inbox"],
         "prerequisites": ["Order submitted"],
-        "screenshot": "order_confirmation"
+        "screenshot": "order_confirmation",
+        "product": "ordering-system",
+        "section": "confirmation",
+        "feature": "order-confirmation",
+        "qualityMetrics": {
+          "testCoverage": 90,
+          "bugCount": 1,
+          "riskLevel": "low",
+          "lastUpdated": "2025-07-15T10:30:00Z"
+        }
       }
     }
   ],

@@ -1,5 +1,6 @@
 import React from 'react';
 import { FlowNodeData } from '../types/flow';
+import { getRiskLevelColor } from '../services/qualityService';
 
 interface NodeDetailsPanelProps {
   nodeData: FlowNodeData | null;
@@ -13,18 +14,6 @@ interface NodeDetailsPanelProps {
 const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }) => {
   if (!nodeData) return null;
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'buyer':
-        return 'bg-blue-50 border-blue-200 text-blue-900';
-      case 'distributor':
-        return 'bg-green-50 border-green-200 text-green-900';
-      case 'admin':
-        return 'bg-purple-50 border-purple-200 text-purple-900';
-      default:
-        return 'bg-gray-50 border-gray-200 text-gray-900';
-    }
-  };
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -120,6 +109,125 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
                 </li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {/* Product Hierarchy */}
+        {(nodeData.product || nodeData.section || nodeData.feature) && (
+          <div>
+            <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+              <svg className="w-4 h-4 mr-1 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              Product Hierarchy
+            </h4>
+            <div className="bg-gray-50 rounded-md p-3 space-y-2">
+              {nodeData.product && (
+                <div className="flex items-center text-sm">
+                  <span className="font-medium text-gray-700 w-16">Product:</span>
+                  <span className="text-gray-600">{nodeData.product}</span>
+                </div>
+              )}
+              {nodeData.section && (
+                <div className="flex items-center text-sm">
+                  <span className="font-medium text-gray-700 w-16">Section:</span>
+                  <span className="text-gray-600">{nodeData.section}</span>
+                </div>
+              )}
+              {nodeData.feature && (
+                <div className="flex items-center text-sm">
+                  <span className="font-medium text-gray-700 w-16">Feature:</span>
+                  <span className="text-gray-600">{nodeData.feature}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Quality Metrics */}
+        {nodeData.qualityMetrics && (
+          <div>
+            <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+              <svg className="w-4 h-4 mr-1 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Quality Metrics
+            </h4>
+            <div className="space-y-3">
+              {/* Risk Level */}
+              {nodeData.qualityMetrics.riskLevel && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Risk Level:</span>
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRiskLevelColor(nodeData.qualityMetrics.riskLevel).background} ${getRiskLevelColor(nodeData.qualityMetrics.riskLevel).text}`}>
+                    {nodeData.qualityMetrics.riskLevel.toUpperCase()}
+                  </span>
+                </div>
+              )}
+              
+              {/* Test Coverage */}
+              {nodeData.qualityMetrics.testCoverage !== undefined && (
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-gray-600">Test Coverage:</span>
+                    <span className="text-sm font-medium">{nodeData.qualityMetrics.testCoverage}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${nodeData.qualityMetrics.testCoverage}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              
+              {/* Bug Count */}
+              {nodeData.qualityMetrics.bugCount !== undefined && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Open Bugs:</span>
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    nodeData.qualityMetrics.bugCount === 0 
+                      ? 'bg-green-100 text-green-800' 
+                      : nodeData.qualityMetrics.bugCount <= 2 
+                        ? 'bg-yellow-100 text-yellow-800' 
+                        : 'bg-red-100 text-red-800'
+                  }`}>
+                    {nodeData.qualityMetrics.bugCount}
+                  </span>
+                </div>
+              )}
+              
+              {/* Test Results */}
+              {nodeData.qualityMetrics.testResults && (
+                <div>
+                  <span className="text-sm text-gray-600 mb-2 block">Test Results:</span>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                      <span>Passed: {nodeData.qualityMetrics.testResults.passed}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
+                      <span>Failed: {nodeData.qualityMetrics.testResults.failed}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></div>
+                      <span>Skipped: {nodeData.qualityMetrics.testResults.skipped}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-gray-500 rounded-full mr-1"></div>
+                      <span>Total: {nodeData.qualityMetrics.testResults.total}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Last Updated */}
+              {nodeData.qualityMetrics.lastUpdated && (
+                <div className="text-xs text-gray-500">
+                  Last updated: {new Date(nodeData.qualityMetrics.lastUpdated).toLocaleString()}
+                </div>
+              )}
+            </div>
           </div>
         )}
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Handle, Position } from 'reactflow';
 import { FlowNodeData } from '../types/flow';
+import { getRiskLevelNodeColor } from '../services/qualityService';
 
 interface SimpleFlowNodeProps {
   data: FlowNodeData;
@@ -15,9 +16,15 @@ const SimpleFlowNode: React.FC<SimpleFlowNodeProps> = ({
   data, 
   isConnectable
 }) => {
-  // Role-based styling
-  const getRoleColor = (role: string) => {
-    switch (role) {
+  // Get node color based on risk level or role
+  const getNodeColor = (data: FlowNodeData) => {
+    // Use risk level color if available
+    if (data.qualityMetrics?.riskLevel) {
+      return `border-2 text-white font-medium text-sm text-center cursor-pointer transition-all duration-200 hover:scale-105 hover:brightness-110`;
+    }
+    
+    // Fall back to role-based styling
+    switch (data.role) {
       case 'buyer':
         return 'bg-blue-500 border-blue-600 hover:bg-blue-600';
       case 'distributor':
@@ -43,10 +50,16 @@ const SimpleFlowNode: React.FC<SimpleFlowNodeProps> = ({
       <div 
         className={`
           w-24 h-24 rounded-full flex items-center justify-center
-          border-2 text-white font-medium text-sm text-center
-          cursor-pointer transition-all duration-200 hover:scale-105
-          ${getRoleColor(data.role)}
+          ${getNodeColor(data)}
         `}
+        style={{
+          backgroundColor: data.qualityMetrics?.riskLevel 
+            ? getRiskLevelNodeColor(data.qualityMetrics.riskLevel) 
+            : undefined,
+          borderColor: data.qualityMetrics?.riskLevel 
+            ? getRiskLevelNodeColor(data.qualityMetrics.riskLevel) 
+            : undefined
+        }}
       >
         <span className="leading-tight px-2">
           {data.label}

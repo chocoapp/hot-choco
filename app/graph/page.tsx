@@ -19,6 +19,7 @@ import SimpleFlowNode from '../../components/SimpleFlowNode';
 import NodeDetailsPanel from '../../components/NodeDetailsPanel';
 import { FlowData, FlowNode as FlowNodeType, FlowEdge, FlowNodeData } from '../../types/flow';
 import { getLayoutedElements } from '../../utils/layoutUtils';
+import { getRiskLevelNodeColor } from '../../services/qualityService';
 
 // Define custom node types outside component to prevent re-creation
 const nodeTypes = {
@@ -162,9 +163,19 @@ const GraphPage: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-blue-200 rounded-full"></div>
-              <span className="text-sm text-gray-600">Buyer Role</span>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-1">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-gray-600">Low Risk</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <span className="text-sm text-gray-600">Medium Risk</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <span className="text-sm text-gray-600">High Risk</span>
+              </div>
             </div>
             <div className="text-sm text-gray-500">
               {nodes.length} screens • {edges.length} transitions
@@ -208,7 +219,6 @@ const GraphPage: React.FC = () => {
               color="#e5e7eb" 
               gap={20} 
               size={1}
-              variant="dots"
             />
             
             {/* Navigation controls */}
@@ -223,6 +233,12 @@ const GraphPage: React.FC = () => {
               position="bottom-right"
               className="bg-white shadow-lg border border-gray-200"
               nodeColor={(node) => {
+                // Use risk level color if available, otherwise fall back to role color
+                const riskLevel = node.data.qualityMetrics?.riskLevel;
+                if (riskLevel) {
+                  return getRiskLevelNodeColor(riskLevel);
+                }
+                
                 const role = node.data.role;
                 switch (role) {
                   case 'buyer': return '#3b82f6';

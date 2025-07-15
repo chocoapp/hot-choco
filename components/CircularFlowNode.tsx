@@ -1,11 +1,12 @@
 import React, { memo, useCallback } from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position } from 'reactflow';
 import { FlowNodeData } from '../types/flow';
 
-interface CircularFlowNodeProps extends NodeProps {
+interface CircularFlowNodeProps {
   data: FlowNodeData;
   isConnectable: boolean;
   selected?: boolean;
+  id: string;
 }
 
 /**

@@ -2,6 +2,24 @@
  * Types for the user flow visualization system
  */
 
+export interface QualityMetrics {
+  /** Test coverage percentage (0-100) */
+  testCoverage?: number;
+  /** Number of open bugs */
+  bugCount?: number;
+  /** Risk level based on bugs and test coverage */
+  riskLevel?: 'low' | 'medium' | 'high';
+  /** Last time quality metrics were updated */
+  lastUpdated?: string;
+  /** Allure TestOps test results */
+  testResults?: {
+    passed: number;
+    failed: number;
+    skipped: number;
+    total: number;
+  };
+}
+
 export interface FlowNodeData {
   /** Display name for the node */
   label: string;
@@ -17,6 +35,18 @@ export interface FlowNodeData {
   prerequisites?: string[];
   /** Screenshot filename for this screen */
   screenshot: string;
+  
+  // Product hierarchy mapping
+  /** Product this screen belongs to (e.g., "ordering-system", "authentication") */
+  product?: string;
+  /** Section within the product (e.g., "login", "checkout", "user-management") */
+  section?: string;
+  /** Specific feature (e.g., "phone-login", "email-verification", "payment-processing") */
+  feature?: string;
+  
+  // Quality and risk metrics
+  /** Quality metrics for this screen */
+  qualityMetrics?: QualityMetrics;
 }
 
 export interface FlowNode {
