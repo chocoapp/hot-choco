@@ -1,0 +1,103 @@
+   ▲ Next.js 15.3.5
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.2.176:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1297ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1198ms (741 modules)
+ HEAD / 200 in 1412ms
+ ○ Compiling /graph ...
+ ✓ Compiled /graph in 2.1s (1677 modules)
+ HEAD /graph 200 in 2296ms
+ GET /graph 200 in 64ms
+ ✓ Compiled /_not-found in 359ms (1667 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 441ms
+ ✓ Compiled /favicon.ico in 295ms (907 modules)
+ GET /favicon.ico 200 in 372ms
+ ✓ Compiled in 346ms (787 modules)
+ GET /graph 200 in 58ms
+ ✓ Compiled in 110ms (787 modules)
+ GET /graph 200 in 14ms
+ ✓ Compiled in 104ms (787 modules)
+ GET /graph 200 in 12ms
+ ✓ Compiled in 107ms (787 modules)
+ GET /graph 200 in 12ms
+ ✓ Compiled in 94ms (787 modules)
+ GET /graph 200 in 11ms
+ ✓ Compiled in 94ms (787 modules)
+ GET /graph 200 in 10ms
+ ✓ Compiled in 138ms (787 modules)
+ GET /graph 200 in 13ms
+ ✓ Compiled in 125ms (787 modules)
+ GET /graph 200 in 11ms
+ ✓ Compiled in 123ms (787 modules)
+ GET /graph 200 in 12ms
+ ✓ Compiled in 176ms (787 modules)
+ GET /graph 200 in 14ms
+ ✓ Compiled in 194ms (787 modules)
+ GET /graph 200 in 21ms
+ ✓ Compiled in 118ms (787 modules)
+ GET /graph 200 in 10ms
+ ✓ Compiled in 106ms (787 modules)
+ GET /graph 200 in 9ms
+ ✓ Compiled in 104ms (787 modules)
+ GET /graph 200 in 17ms
+ ✓ Compiled in 102ms (787 modules)
+ GET /graph 200 in 9ms
+ ✓ Compiled in 116ms (787 modules)
+ GET /graph 200 in 10ms
+ ✓ Compiled in 125ms (787 modules)
+ GET /graph 200 in 11ms
+ ✓ Compiled in 140ms (787 modules)
+ GET /graph 200 in 11ms
+ ✓ Compiled in 99ms (787 modules)
+ GET /graph 200 in 9ms
+ ✓ Compiled in 84ms (787 modules)
+ GET /graph 200 in 8ms
+ ✓ Compiled in 93ms (787 modules)
+ GET /graph 200 in 9ms
+ ✓ Compiled in 188ms (787 modules)
+ GET /graph 200 in 12ms
+ ✓ Compiled in 100ms (787 modules)
+ GET /graph 200 in 11ms
+ ✓ Compiled in 96ms (787 modules)
+ GET /graph 200 in 10ms
+ ✓ Compiled in 91ms (787 modules)
+ GET /graph 200 in 18ms
+ ✓ Compiled in 95ms (787 modules)
+ GET /graph 200 in 9ms
+ ✓ Compiled in 131ms (787 modules)
+ GET /graph 200 in 9ms
+ ✓ Compiled in 105ms (787 modules)
+ GET /graph 200 in 18ms
+ ✓ Compiled in 111ms (787 modules)
+ GET /graph 200 in 11ms
+ ✓ Compiled in 95ms (787 modules)
+ GET /graph 200 in 9ms
+ ✓ Compiled in 134ms (787 modules)
+ GET /graph 200 in 12ms
+ ✓ Compiled in 123ms (787 modules)
+ GET /graph 200 in 11ms
+ ✓ Compiled in 118ms (787 modules)
+ GET /graph 200 in 10ms
+ ✓ Compiled in 127ms (787 modules)
+ GET /graph 200 in 11ms
+ GET /graph 200 in 111ms
+ ✓ Compiled /_not-found in 370ms (1612 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 477ms
+ ✓ Compiled /favicon.ico in 109ms (852 modules)
+ GET /favicon.ico 200 in 171ms
+ ✓ Compiled in 166ms (790 modules)
+ GET /graph 200 in 49ms
+ GET /graph 200 in 11ms
+ ○ Compiling /test-supabase ...
+ ✓ Compiled /test-supabase in 574ms (1792 modules)
+Using real Supabase service
+ GET /test-supabase 200 in 722ms
+ GET /favicon.ico 200 in 15ms
+ GET /graph 200 in 104ms
+ GET /favicon.ico 200 in 5ms
+ GET /graph 200 in 60ms
+ GET /favicon.ico 200 in 9ms
