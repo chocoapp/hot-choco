@@ -44,18 +44,23 @@ export class QualityServiceImpl implements QualityService {
     const bugCount = await this.supabaseService.getBugCount(product, section, feature);
     
     // Calculate risk level
-    const riskLevel = this.calculateRiskLevel(testCoverage.coveragePercentage, bugCount);
+    const riskLevel = this.calculateRiskLevel(testCoverage?.coveragePercentage || 0, bugCount);
     
     return {
-      testCoverage: testCoverage.coveragePercentage,
+      testCoverage: testCoverage?.coveragePercentage || 0,
       bugCount,
       riskLevel,
       lastUpdated: new Date().toISOString(),
-      testResults: {
+      testResults: testStats ? {
         passed: testStats.passed,
         failed: testStats.failed,
         skipped: testStats.skipped,
         total: testStats.total
+      } : {
+        passed: 0,
+        failed: 0,
+        skipped: 0,
+        total: 0
       }
     };
   }

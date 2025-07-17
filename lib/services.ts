@@ -3,11 +3,18 @@
  */
 
 import { supabaseService } from './supabase';
-import { MockAllureService } from '../services/allureService';
+import { RealAllureService } from '../services/allureService';
 import { QualityServiceImpl } from '../services/qualityService';
 
+// Factory function to create the appropriate Allure service
+function createAllureService() {
+  // Use real service if we have access to the TestOps API
+  // For now, we'll use the real service by default
+  return new RealAllureService();
+}
+
 // Create service instances
-const allureService = new MockAllureService();
+const allureService = createAllureService();
 const qualityService = new QualityServiceImpl(supabaseService, allureService);
 
 // Export all services

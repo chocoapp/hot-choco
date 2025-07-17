@@ -21,7 +21,7 @@ export interface SupabaseMetadata {
   section?: string;
   blobType?: string;
   issueType?: string;
-  sourceType: 'docs' | 'bugs';
+  sourceType: 'docs' | 'bug';
   statusCategory?: string;
 }
 
@@ -88,6 +88,11 @@ export interface SupabaseService {
    * Get bug reports by hierarchy
    */
   getBugReports(product: string, section?: string, feature?: string): Promise<BugReport[]>;
+  
+  /**
+   * Get bug reports by hierarchy and status category
+   */
+  getBugReportsByStatus(product: string, statusCategory: 'open' | 'closed', section?: string, feature?: string): Promise<BugReport[]>;
   
   /**
    * Get bug count for a specific feature/section/product
@@ -227,6 +232,9 @@ export class RealSupabaseService implements SupabaseService {
 
   async getProductDocs(product: string, section?: string, feature?: string): Promise<ProductDocumentation[]> {
     try {
+      console.log('getProductDocs called with:', { product, section, feature });
+      console.log('Using table:', this.tableName);
+      
       let queryBuilder = this.supabase
         .from(this.tableName)
         .select('*')
@@ -241,13 +249,24 @@ export class RealSupabaseService implements SupabaseService {
       }
 
       const { data, error } = await queryBuilder;
+      
+      console.log('getProductDocs query result:', { 
+        product, 
+        section, 
+        feature, 
+        resultCount: data?.length || 0,
+        error: error?.message,
+        sampleData: data?.slice(0, 1)
+      });
 
       if (error) {
         console.error('Error getting product docs:', error);
         return [];
       }
 
-      return (data as SupabaseRow[]).map(row => this.convertRowToProductDoc(row));
+      const results = (data as SupabaseRow[]).map(row => this.convertRowToProductDoc(row));
+      console.log('getProductDocs converted results:', results.length);
+      return results;
     } catch (error) {
       console.error('Error in getProductDocs:', error);
       return [];
@@ -259,7 +278,7 @@ export class RealSupabaseService implements SupabaseService {
       let queryBuilder = this.supabase
         .from(this.tableName)
         .select('*')
-        .eq('metadata->>sourceType', 'bugs');
+        .eq('metadata->>sourceType', 'bug');
 
       if (product) {
         queryBuilder = queryBuilder.eq('metadata->>product', product);
@@ -292,10 +311,14 @@ export class RealSupabaseService implements SupabaseService {
 
   async getBugReports(product: string, section?: string, feature?: string): Promise<BugReport[]> {
     try {
+      console.log('getBugReports called with:', { product, section, feature });
+      console.log('Using table:', this.tableName);
+      console.log('Service instance:', this.constructor.name);
+      
       let queryBuilder = this.supabase
         .from(this.tableName)
         .select('*')
-        .eq('metadata->>sourceType', 'bugs')
+        .eq('metadata->>sourceType', 'bug')
         .eq('metadata->>product', product);
 
       if (section) {
@@ -306,15 +329,68 @@ export class RealSupabaseService implements SupabaseService {
       }
 
       const { data, error } = await queryBuilder;
+      
+      console.log('getBugReports query result:', { 
+        product, 
+        section, 
+        feature, 
+        resultCount: data?.length || 0,
+        error: error?.message,
+        sampleData: data?.slice(0, 1)
+      });
 
       if (error) {
         console.error('Error getting bug reports:', error);
         return [];
       }
 
-      return (data as SupabaseRow[]).map(row => this.convertRowToBugReport(row));
+      const results = (data as SupabaseRow[]).map(row => this.convertRowToBugReport(row));
+      console.log('getBugReports converted results:', results.length);
+      return results;
     } catch (error) {
       console.error('Error in getBugReports:', error);
+      return [];
+    }
+  }
+
+  async getBugReportsByStatus(product: string, statusCategory: 'open' | 'closed', section?: string, feature?: string): Promise<BugReport[]> {
+    try {
+      console.log('getBugReportsByStatus called with:', { product, statusCategory, section, feature });
+      console.log('Using table:', this.tableName);
+      
+      // Simple query: just filter by statusCategory and feature (feature should be unique enough)
+      let queryBuilder = this.supabase
+        .from(this.tableName)
+        .select('*')
+        .eq('metadata->>sourceType', 'bug')
+        .eq('metadata->>statusCategory', statusCategory);
+
+      if (feature) {
+        queryBuilder = queryBuilder.eq('metadata->>feature', feature);
+        console.log('Filtering by feature:', feature);
+      }
+
+      console.log('About to execute simplified query...');
+      const { data, error } = await queryBuilder;
+      
+      console.log('getBugReportsByStatus query result:', { 
+        statusCategory,
+        feature,
+        resultCount: data?.length || 0,
+        error: error?.message,
+        sampleData: data?.slice(0, 3)
+      });
+
+      if (error) {
+        console.error('Error getting bug reports by status:', error);
+        return [];
+      }
+
+      const results = (data as SupabaseRow[]).map(row => this.convertRowToBugReport(row));
+      console.log('getBugReportsByStatus final results:', results.length, results);
+      return results;
+    } catch (error) {
+      console.error('Error in getBugReportsByStatus:', error);
       return [];
     }
   }
@@ -324,7 +400,7 @@ export class RealSupabaseService implements SupabaseService {
       let queryBuilder = this.supabase
         .from(this.tableName)
         .select('id', { count: 'exact' })
-        .eq('metadata->>sourceType', 'bugs')
+        .eq('metadata->>sourceType', 'bug')
         .eq('metadata->>product', product)
         .in('metadata->>statusCategory', ['open', 'new']); // Only count open bugs
 
@@ -387,7 +463,7 @@ export class RealSupabaseService implements SupabaseService {
       const row: Partial<SupabaseRow> = {
         content: bug.description,
         metadata: {
-          sourceType: 'bugs',
+          sourceType: 'bug',
           product: bug.product,
           section: bug.section,
           feature: bug.feature,
@@ -419,7 +495,7 @@ export class RealSupabaseService implements SupabaseService {
   }
 
   // Vector similarity search using embeddings
-  async searchSimilarContent(query: string, embedding: number[], sourceType: 'docs' | 'bugs', limit: number = 10): Promise<SupabaseRow[]> {
+  async searchSimilarContent(query: string, embedding: number[], sourceType: 'docs' | 'bug', limit: number = 10): Promise<SupabaseRow[]> {
     try {
       const { data, error } = await this.supabase.rpc('match_documents', {
         query_embedding: embedding,
@@ -460,17 +536,57 @@ export class MockSupabaseService implements SupabaseService {
   private mockBugs: BugReport[] = [
     {
       id: '1',
-      product: 'ordering-system',
-      section: 'catalog',
-      feature: 'product-browsing',
-      title: 'Product images not loading',
-      description: 'Product images fail to load on slow connections',
+      product: 'product_ecommerce',
+      section: 'section_account_team_management',
+      feature: 'feature_user_login',
+      title: 'BYR-1628',
+      description: 'Login timeout issue on slow connections',
       severity: 'medium',
       status: 'open',
       assignee: 'dev-team',
       createdAt: '2025-07-10T09:00:00Z',
       updatedAt: '2025-07-10T09:00:00Z',
-      tags: ['ui', 'performance']
+      tags: ['ui', 'performance'],
+      source: 'BYR-1628',
+      team: 'BUYER',
+      issueType: 'functionality',
+      statusCategory: 'open'
+    },
+    {
+      id: '2',
+      product: 'product_ecommerce',
+      section: 'section_order_guide_management',
+      feature: 'feature_order_guide',
+      title: 'BYR-1629',
+      description: 'Order guide filters not working correctly',
+      severity: 'high',
+      status: 'in-progress',
+      assignee: 'dev-team',
+      createdAt: '2025-07-08T14:00:00Z',
+      updatedAt: '2025-07-15T10:00:00Z',
+      tags: ['bug', 'critical'],
+      source: 'BYR-1629',
+      team: 'BUYER',
+      issueType: 'bug',
+      statusCategory: 'open'
+    },
+    {
+      id: '3',
+      product: 'product_ecommerce',
+      section: 'section_order_guide_management',
+      feature: 'feature_order_guide',
+      title: 'BYR-1630',
+      description: 'Fixed pagination in order guide',
+      severity: 'medium',
+      status: 'closed',
+      assignee: 'dev-team',
+      createdAt: '2025-07-05T10:00:00Z',
+      updatedAt: '2025-07-12T16:00:00Z',
+      tags: ['bug', 'fixed'],
+      source: 'BYR-1630',
+      team: 'BUYER',
+      issueType: 'bug',
+      statusCategory: 'closed'
     }
   ];
 
@@ -503,6 +619,15 @@ export class MockSupabaseService implements SupabaseService {
       bug.product === product &&
       (!section || bug.section === section) &&
       (!feature || bug.feature === feature)
+    );
+  }
+
+  async getBugReportsByStatus(product: string, statusCategory: 'open' | 'closed', section?: string, feature?: string): Promise<BugReport[]> {
+    return this.mockBugs.filter(bug => 
+      bug.product === product &&
+      (!section || bug.section === section) &&
+      (!feature || bug.feature === feature) &&
+      bug.statusCategory === statusCategory
     );
   }
 

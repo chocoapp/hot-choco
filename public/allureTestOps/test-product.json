@@ -1,0 +1,479 @@
+{
+    "content": [
+      {
+        "id": 5796,
+        "name": "Ads",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 18
+      },
+      {
+        "id": 1185,
+        "name": "Buyer",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 7
+      },
+      {
+        "id": 6010,
+        "name": "Buyer/eCommerce",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 14
+      },
+      {
+        "id": 5520,
+        "name": "CashFlow",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 12
+      },
+      {
+        "id": 567,
+        "name": "Catalog",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 1455
+      },
+      {
+        "id": 566,
+        "name": "Chat",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 91
+      },
+      {
+        "id": 631,
+        "name": "Choco AI",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 10
+      },
+      {
+        "id": 3410,
+        "name": "Customer Insights",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 1
+      },
+      {
+        "id": 6080,
+        "name": "E-Mail Marketing",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 11
+      },
+      {
+        "id": 1460,
+        "name": "General",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 2
+      },
+      {
+        "id": 1146,
+        "name": "Integrations",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 4
+      },
+      {
+        "id": 663,
+        "name": "Inventory",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 38
+      },
+      {
+        "id": 565,
+        "name": "Lobby",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 62
+      },
+      {
+        "id": 727,
+        "name": "Login & Signup",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 96
+      },
+      {
+        "id": 695,
+        "name": "LOX",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 43
+      },
+      {
+        "id": 562,
+        "name": "Marketing",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 99
+      },
+      {
+        "id": 1190,
+        "name": "Messaging",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 4
+      },
+      {
+        "id": 5307,
+        "name": "Order Agent",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 38
+      },
+      {
+        "id": 563,
+        "name": "Ordering",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 408
+      },
+      {
+        "id": 969,
+        "name": "Payments",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 167
+      },
+      {
+        "id": 3723,
+        "name": "Prospecting",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 1
+      },
+      {
+        "id": 6047,
+        "name": "Sales Center",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 3
+      },
+      {
+        "id": 1147,
+        "name": "Supplier",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 94
+      },
+      {
+        "id": 564,
+        "name": "Team Management",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 26
+      },
+      {
+        "id": 1186,
+        "name": "User",
+        "global": false,
+        "customField": {
+          "id": 67,
+          "name": "Product",
+          "required": false,
+          "archived": false,
+          "singleSelect": false,
+          "locked": false,
+          "createdDate": 1709373615174,
+          "lastModifiedDate": 1748613104078,
+          "createdBy": "himanshu.sharma",
+          "lastModifiedBy": "admin"
+        },
+        "testCasesCount": 8
+      }
+    ],
+    "pageable": {
+      "pageNumber": 0,
+      "pageSize": 50,
+      "sort": {
+        "empty": false,
+        "sorted": true,
+        "unsorted": false
+      },
+      "offset": 0,
+      "paged": true,
+      "unpaged": false
+    },
+    "totalElements": 25,
+    "totalPages": 1,
+    "last": true,
+    "size": 50,
+    "number": 0,
+    "sort": {
+      "empty": false,
+      "sorted": true,
+      "unsorted": false
+    },
+    "numberOfElements": 25,
+    "first": true,
+    "empty": false
+  }

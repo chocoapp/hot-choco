@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FlowNodeData } from '../types/flow';
 import { getRiskLevelColor } from '../services/qualityService';
+import DetailedViewModal from './DetailedViewModal';
+import { supabaseService } from '../lib/supabase';
+import { BugReport } from '../services/supabaseService';
+import { allureService } from '../lib/services';
+import { TestCase } from '../services/allureService';
 
 interface NodeDetailsPanelProps {
   nodeData: FlowNodeData | null;
@@ -12,8 +17,110 @@ interface NodeDetailsPanelProps {
  * Includes screenshot, description, actions, and prerequisites
  */
 const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showBugDetails, setShowBugDetails] = useState(false);
+  const [openBugs, setOpenBugs] = useState<BugReport[]>([]);
+  const [closedBugs, setClosedBugs] = useState<BugReport[]>([]);
+  const [loadingBugs, setLoadingBugs] = useState(false);
+  const [showTestDetails, setShowTestDetails] = useState(false);
+  const [testCases, setTestCases] = useState<TestCase[]>([]);
+  const [loadingTests, setLoadingTests] = useState(false);
+  
   if (!nodeData) return null;
 
+  const loadBugDetails = async () => {
+    if (!nodeData.feature) return;
+    
+    console.log('Loading bug details for:', {
+      product: nodeData.product,
+      section: nodeData.section,
+      feature: nodeData.feature
+    });
+    
+    setLoadingBugs(true);
+    try {
+      const [openBugsData, closedBugsData] = await Promise.all([
+        supabaseService.getBugReportsByStatus(nodeData.product!, 'open', nodeData.section, nodeData.feature),
+        supabaseService.getBugReportsByStatus(nodeData.product!, 'closed', nodeData.section, nodeData.feature)
+      ]);
+      
+      console.log('Bug results:', {
+        openBugs: openBugsData.length,
+        closedBugs: closedBugsData.length,
+        openBugsData,
+        closedBugsData
+      });
+      
+      setOpenBugs(openBugsData);
+      setClosedBugs(closedBugsData);
+    } catch (error) {
+      console.error('Error loading bug details:', error);
+    } finally {
+      setLoadingBugs(false);
+    }
+  };
+
+  const loadTestDetails = async () => {
+    if (!nodeData.feature) return;
+    
+    console.log('Loading test details for:', {
+      product: nodeData.product,
+      section: nodeData.section,
+      feature: nodeData.feature
+    });
+    
+    setLoadingTests(true);
+    try {
+      const testCasesData = await allureService.getTestCases(nodeData.product!, nodeData.section, nodeData.feature);
+      
+      console.log('Test cases result:', {
+        testCases: testCasesData.length,
+        testCasesData
+      });
+      
+      setTestCases(testCasesData);
+    } catch (error) {
+      console.error('Error loading test details:', error);
+    } finally {
+      setLoadingTests(false);
+    }
+  };
+
+  const handleBugCountClick = () => {
+    if (!showBugDetails) {
+      loadBugDetails();
+    }
+    setShowBugDetails(!showBugDetails);
+  };
+
+  const handleTestCountClick = () => {
+    if (!showTestDetails) {
+      loadTestDetails();
+    }
+    setShowTestDetails(!showTestDetails);
+  };
+
+  const getBugUrl = (source: string) => {
+    if (source && source.includes('-')) {
+      return `https://choco.atlassian.net/browse/${source}`;
+    }
+    return null;
+  };
+
+  const getTestStatusColor = (status: string) => {
+    switch (status) {
+      case 'passed':
+        return 'bg-green-100 text-green-800';
+      case 'failed':
+        return 'bg-red-100 text-red-800';
+      case 'skipped':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'broken':
+        return 'bg-orange-100 text-orange-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -164,60 +271,166 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
                 </div>
               )}
               
-              {/* Test Coverage */}
-              {nodeData.qualityMetrics.testCoverage !== undefined && (
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-gray-600">Test Coverage:</span>
-                    <span className="text-sm font-medium">{nodeData.qualityMetrics.testCoverage}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${nodeData.qualityMetrics.testCoverage}%` }}
-                    />
-                  </div>
-                </div>
-              )}
               
               {/* Bug Count */}
               {nodeData.qualityMetrics.bugCount !== undefined && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Open Bugs:</span>
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                    nodeData.qualityMetrics.bugCount === 0 
-                      ? 'bg-green-100 text-green-800' 
-                      : nodeData.qualityMetrics.bugCount <= 2 
-                        ? 'bg-yellow-100 text-yellow-800' 
-                        : 'bg-red-100 text-red-800'
-                  }`}>
-                    {nodeData.qualityMetrics.bugCount}
-                  </span>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Open Bugs:</span>
+                    <button
+                      onClick={handleBugCountClick}
+                      className={`px-2 py-1 text-xs font-medium rounded-full hover:opacity-80 transition-opacity ${
+                        nodeData.qualityMetrics.bugCount === 0 
+                          ? 'bg-green-100 text-green-800' 
+                          : nodeData.qualityMetrics.bugCount <= 2 
+                            ? 'bg-yellow-100 text-yellow-800' 
+                            : 'bg-red-100 text-red-800'
+                      }`}
+                    >
+                      {nodeData.qualityMetrics.bugCount} {showBugDetails ? '▼' : '▶'}
+                    </button>
+                  </div>
+                  
+                  {/* Bug Details */}
+                  {showBugDetails && (
+                    <div className="mt-3 space-y-2">
+                      {loadingBugs ? (
+                        <div className="flex items-center justify-center py-4">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {/* Open Bugs */}
+                          {openBugs.length > 0 && (
+                            <div>
+                              <h5 className="text-xs font-medium text-gray-700 mb-1">Open Bugs ({openBugs.length})</h5>
+                              <div className="space-y-1">
+                                {openBugs.map(bug => (
+                                  <div key={bug.id} className="flex items-start justify-between text-xs bg-red-50 p-2 rounded">
+                                    <div className="flex-1">
+                                      {getBugUrl(bug.source || '') ? (
+                                        <a 
+                                          href={getBugUrl(bug.source || '')!} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="text-blue-600 hover:text-blue-800 font-medium"
+                                        >
+                                          {bug.source}
+                                        </a>
+                                      ) : (
+                                        <span className="font-medium">{bug.source || 'Unknown'}</span>
+                                      )}
+                                      <div className="text-gray-600 mt-1">{bug.issueType}</div>
+                                    </div>
+                                    <span className="ml-2 px-1 py-0.5 bg-red-100 text-red-800 rounded text-xs">
+                                      {bug.status}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Closed Bugs */}
+                          {closedBugs.length > 0 && (
+                            <div>
+                              <h5 className="text-xs font-medium text-gray-700 mb-1">Closed Bugs ({closedBugs.length})</h5>
+                              <div className="space-y-1">
+                                {closedBugs.map(bug => (
+                                  <div key={bug.id} className="flex items-start justify-between text-xs bg-green-50 p-2 rounded">
+                                    <div className="flex-1">
+                                      {getBugUrl(bug.source || '') ? (
+                                        <a 
+                                          href={getBugUrl(bug.source || '')!} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="text-blue-600 hover:text-blue-800 font-medium"
+                                        >
+                                          {bug.source}
+                                        </a>
+                                      ) : (
+                                        <span className="font-medium">{bug.source || 'Unknown'}</span>
+                                      )}
+                                      <div className="text-gray-600 mt-1">{bug.issueType}</div>
+                                    </div>
+                                    <span className="ml-2 px-1 py-0.5 bg-green-100 text-green-800 rounded text-xs">
+                                      {bug.status}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {openBugs.length === 0 && closedBugs.length === 0 && (
+                            <div className="text-xs text-gray-500 text-center py-2">
+                              No bugs found for this feature
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
               
-              {/* Test Results */}
+              
+              {/* Test Cases */}
               {nodeData.qualityMetrics.testResults && (
                 <div>
-                  <span className="text-sm text-gray-600 mb-2 block">Test Results:</span>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                      <span>Passed: {nodeData.qualityMetrics.testResults.passed}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
-                      <span>Failed: {nodeData.qualityMetrics.testResults.failed}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></div>
-                      <span>Skipped: {nodeData.qualityMetrics.testResults.skipped}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-gray-500 rounded-full mr-1"></div>
-                      <span>Total: {nodeData.qualityMetrics.testResults.total}</span>
-                    </div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-gray-600">Test Cases:</span>
+                    <button
+                      onClick={handleTestCountClick}
+                      className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 hover:opacity-80 transition-opacity"
+                    >
+                      {nodeData.qualityMetrics.testResults.total} {showTestDetails ? '▼' : '▶'}
+                    </button>
                   </div>
+                  
+                  {/* Test Cases Details */}
+                  {showTestDetails && (
+                    <div className="mt-2 space-y-2">
+                      {loadingTests ? (
+                        <div className="flex items-center justify-center py-4">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {testCases.length > 0 ? (
+                            testCases.map(testCase => (
+                              <div key={testCase.id} className="flex items-start justify-between text-xs bg-gray-50 p-2 rounded">
+                                <div className="flex-1">
+                                  <a 
+                                    href={`https://choco.testops.cloud/project/1/test-cases/${testCase.id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                                    title="View test case in Allure TestOps"
+                                  >
+                                    {testCase.name}
+                                  </a>
+                                  <div className="text-gray-600 mt-1">{testCase.featureName}</div>
+                                  {testCase.lastExecuted && (
+                                    <div className="text-gray-500 text-xs mt-1">
+                                      Last run: {new Date(testCase.lastExecuted).toLocaleDateString()}
+                                    </div>
+                                  )}
+                                </div>
+                                <span className={`ml-2 px-1 py-0.5 rounded text-xs ${getTestStatusColor(testCase.status || 'skipped')}`}>
+                                  {testCase.status || 'skipped'}
+                                </span>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-xs text-gray-500 text-center py-2">
+                              No test cases found for this feature
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
               
@@ -230,6 +443,16 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
             </div>
           </div>
         )}
+
+        {/* View Details Button */}
+        <div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+          >
+            View Detailed Analysis
+          </button>
+        </div>
 
         {/* Actions */}
         <div>
@@ -249,6 +472,13 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
           </ul>
         </div>
       </div>
+
+      {/* Detailed View Modal */}
+      <DetailedViewModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        nodeData={nodeData}
+      />
     </div>
   );
 };
