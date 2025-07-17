@@ -105,50 +105,51 @@ The risk level is calculated using a weighted scoring system in `QualityServiceI
 
 ## Getting Started
 
+### Prerequisites
+- Node.js 18+ with npm or pnpm
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+
+### Quick Start
+
 1. **Install dependencies:**
 ```bash
 npm install
-# or
-pnpm install
 ```
 
 2. **Run the development server:**
 ```bash
 npm run dev
-# or
-pnpm dev
 ```
 
 3. **Open the application:**
+- **Primary interface**: [http://localhost:3000/graph](http://localhost:3000/graph)
 - Main page: [http://localhost:3000](http://localhost:3000)
-- Flow visualization: [http://localhost:3000/graph](http://localhost:3000/graph)
 
-4. **Build for production:**
-```bash
-npm run build
-```
+The app runs with **Turbopack** for fast development builds and hot reloading.
 
-## Usage
+## Key Features & Usage
 
-### Viewing Flow Visualization
-1. Navigate to `/graph` to see the interactive flow diagram
-2. Nodes are color-coded by risk level (green/yellow/red)
-3. Click any node to see detailed information in the side panel
-4. Use the minimap and controls for navigation
+### Interactive Flow Visualization
+- **Main interface**: Navigate to `/graph` for the interactive flow diagram
+- **Risk-based color coding**: Nodes are colored by risk level (🟢 Low, 🟡 Medium, 🔴 High)
+- **Node details**: Click any node to see detailed information in the side panel
+- **Filtering**: Use "Show Filters" to filter by product, section, or risk level
+- **Navigation**: Minimap and zoom controls for easy navigation
 
-### Understanding Quality Metrics
+### Quality Metrics Dashboard
+Each screen displays:
 - **Test Coverage**: Progress bar showing percentage of tests passing
 - **Bug Count**: Badge showing number of open bugs
 - **Risk Level**: Color-coded badge (Low/Medium/High)
 - **Test Results**: Breakdown of passed/failed/skipped tests
 
-### Product Hierarchy
-Each screen is mapped to:
+### Product Hierarchy Structure
+Screens are organized by:
 - **Product**: High-level product area (e.g., "authentication", "ordering-system")
 - **Section**: Functional section (e.g., "login", "checkout", "catalog")
 - **Feature**: Specific feature (e.g., "phone-login", "product-browsing")
 
-This structure enables direct mapping to documentation, tests, and bug reports stored in external systems.
+This enables direct mapping to documentation, tests, and bug reports in external systems.
 
 ## Technology Stack
 
@@ -157,6 +158,31 @@ This structure enables direct mapping to documentation, tests, and bug reports s
 - **Styling**: Tailwind CSS
 - **Data Sources**: Supabase (vector DB), Allure TestOps
 - **Build**: Turbopack
+
+## Important Implementation Details
+
+### Data Structure
+- Flow data is stored in `public/flow.json` with complete node/edge definitions
+- Each node contains screen metadata, quality metrics, and product hierarchy
+- Live integration with Supabase vector DB and Allure TestOps APIs
+- Fallback mock data available in `public/` for development
+
+### Current State
+- ✅ **Fully functional** with live Supabase and Allure TestOps integration
+- ✅ **Risk calculation** algorithm implemented (`services/qualityService.ts:68`)
+- ✅ **Interactive filtering** by product, section, and risk level
+- ✅ **Auto-layout** using Dagre algorithm for optimal node positioning
+- ✅ **Production ready** with real-time quality metrics
+
+### Development Guidelines
+**Always verify before committing:**
+```bash
+npm run build    # Ensure production build succeeds
+npm run lint     # Check for linting errors
+```
+- Check TypeScript errors in IDE or run `tsc --noEmit`
+- Test the main `/graph` interface functionality
+- Verify Supabase and Allure TestOps connections are working
 
 ## Contributing
 
