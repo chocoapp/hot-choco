@@ -167,8 +167,20 @@ export default function UnifiedDetailsModal({
       }
 
       // Load test data with individual error handling
-      // Only load test data if we don't already have it or if we're in screen mode
-      if (!isFeatureMode || !featureData || featureData.testCount === 0) {
+      try {
+        const testCasesData = await allureService.getTestCases(
+          commonData.product, 
+          commonData.section, 
+          commonData.feature
+        );
+        setTestCases(testCasesData);
+      } catch (error) {
+        console.error('Error loading test cases:', error);
+        setTestCases([]);
+      }
+
+      // For feature mode, we don't need to load coverage/stats since we have the test count
+      if (!isFeatureMode) {
         try {
           const coverageData = await allureService.getTestCoverage(
             commonData.product, 
@@ -192,28 +204,10 @@ export default function UnifiedDetailsModal({
           console.error('Error loading test stats:', error);
           setTestStats(null);
         }
-
-        try {
-          const testCasesData = await allureService.getTestCases(
-            commonData.product, 
-            commonData.section, 
-            commonData.feature
-          );
-          setTestCases(testCasesData);
-        } catch (error) {
-          console.error('Error loading test cases:', error);
-          setTestCases([]);
-        }
       } else {
-        // For feature mode with existing test data, create a mock stats object
-        setTestStats({
-          total: featureData.testCount,
-          passed: 0,
-          failed: 0,
-          skipped: 0
-        });
+        // For feature mode, we don't need these
         setTestCoverage(null);
-        setTestCases([]);
+        setTestStats(null);
       }
 
       console.log('Loaded detailed data successfully');
@@ -678,9 +672,11 @@ export default function UnifiedDetailsModal({
                                 </div>
                               )}
                             </div>
-                            <span className={`ml-2 px-2 py-1 rounded text-xs ${getTestStatusColor(testCase.status || 'skipped')}`}>
-                              {testCase.status || 'skipped'}
-                            </span>
+                            {testCase.status && (
+                              <span className={`ml-2 px-2 py-1 rounded text-xs ${getTestStatusColor(testCase.status)}`}>
+                                {testCase.status}
+                              </span>
+                            )}
                           </div>
                         ))}
                       </div>
