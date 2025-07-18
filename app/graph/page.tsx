@@ -18,6 +18,7 @@ import 'reactflow/dist/style.css';
 import SimpleFlowNode from '../../components/SimpleFlowNode';
 import NodeDetailsPanel from '../../components/NodeDetailsPanel';
 import ProductFilter, { FilterOptions } from '../../components/ProductFilter';
+import RiskOverview from '../../components/RiskOverview';
 import { FlowData, FlowNode as FlowNodeType, FlowEdge, FlowNodeData } from '../../types/flow';
 import { getLayoutedElements } from '../../utils/layoutUtils';
 import { getRiskLevelNodeColor } from '../../services/qualityService';
@@ -38,6 +39,7 @@ const GraphPage: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState<FlowNodeData | null>(null);
   const [filters, setFilters] = useState<FilterOptions>({ products: [], sections: [], riskLevels: [] });
   const [showFilters, setShowFilters] = useState(false);
+  const [showRiskOverview, setShowRiskOverview] = useState(false);
   
   // Debug selectedNode changes
   useEffect(() => {
@@ -220,6 +222,12 @@ const GraphPage: React.FC = () => {
             >
               {showFilters ? 'Hide Filters' : 'Show Filters'}
             </button>
+            <button
+              onClick={() => setShowRiskOverview(!showRiskOverview)}
+              className="px-3 py-1 text-sm font-medium text-gray-700 bg-red-100 hover:bg-red-200 rounded-md transition-colors"
+            >
+              {showRiskOverview ? 'Hide Risk Overview' : 'Risk Overview'}
+            </button>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-1">
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -248,6 +256,13 @@ const GraphPage: React.FC = () => {
             nodes={allNodeData}
             onFilterChange={handleFilterChange}
           />
+        </div>
+      )}
+
+      {/* Risk Overview Panel */}
+      {showRiskOverview && (
+        <div className="px-6 pb-4">
+          <RiskOverview nodes={allNodeData} />
         </div>
       )}
 

@@ -3,21 +3,14 @@
  */
 
 export interface QualityMetrics {
-  /** Test coverage percentage (0-100) */
-  testCoverage?: number;
   /** Number of open bugs */
   bugCount?: number;
-  /** Risk level based on bugs and test coverage */
+  /** Risk level based on bugs and test count */
   riskLevel?: 'low' | 'medium' | 'high';
   /** Last time quality metrics were updated */
   lastUpdated?: string;
-  /** Allure TestOps test results */
-  testResults?: {
-    passed: number;
-    failed: number;
-    skipped: number;
-    total: number;
-  };
+  /** Test count from Allure TestOps */
+  testCount?: number;
 }
 
 export interface FlowNodeData {

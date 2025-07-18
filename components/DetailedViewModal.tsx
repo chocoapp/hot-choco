@@ -173,8 +173,8 @@ export default function DetailedViewModal({ isOpen, onClose, nodeData }: Detaile
                       <h3 className="font-semibold text-gray-900 mb-2">Quality Metrics</h3>
                       <div className="space-y-2">
                         <div className="flex justify-between">
-                          <span>Test Coverage:</span>
-                          <span className="font-medium">{nodeData.qualityMetrics?.testCoverage || 0}%</span>
+                          <span>Test Cases:</span>
+                          <span className="font-medium">{nodeData.qualityMetrics?.testCount || 0}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Bug Count:</span>

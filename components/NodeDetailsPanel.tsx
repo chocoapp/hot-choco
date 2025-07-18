@@ -107,20 +107,6 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
     return null;
   };
 
-  const getTestStatusColor = (status: string) => {
-    switch (status) {
-      case 'passed':
-        return 'bg-green-100 text-green-800';
-      case 'failed':
-        return 'bg-red-100 text-red-800';
-      case 'skipped':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'broken':
-        return 'bg-orange-100 text-orange-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -375,64 +361,54 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
               )}
               
               
-              {/* Test Cases */}
-              {nodeData.qualityMetrics.testResults && (
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-600">Test Cases:</span>
-                    <button
-                      onClick={handleTestCountClick}
-                      className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 hover:opacity-80 transition-opacity"
-                    >
-                      {nodeData.qualityMetrics.testResults.total} {showTestDetails ? '▼' : '▶'}
-                    </button>
-                  </div>
-                  
-                  {/* Test Cases Details */}
-                  {showTestDetails && (
-                    <div className="mt-2 space-y-2">
-                      {loadingTests ? (
-                        <div className="flex items-center justify-center py-4">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          {testCases.length > 0 ? (
-                            testCases.map(testCase => (
-                              <div key={testCase.id} className="flex items-start justify-between text-xs bg-gray-50 p-2 rounded">
-                                <div className="flex-1">
-                                  <a 
-                                    href={`https://choco.testops.cloud/project/1/test-cases/${testCase.id}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="font-medium text-blue-600 hover:text-blue-800 hover:underline"
-                                    title="View test case in Allure TestOps"
-                                  >
-                                    {testCase.name}
-                                  </a>
-                                  <div className="text-gray-600 mt-1">{testCase.featureName}</div>
-                                  {testCase.lastExecuted && (
-                                    <div className="text-gray-500 text-xs mt-1">
-                                      Last run: {new Date(testCase.lastExecuted).toLocaleDateString()}
-                                    </div>
-                                  )}
-                                </div>
-                                <span className={`ml-2 px-1 py-0.5 rounded text-xs ${getTestStatusColor(testCase.status || 'skipped')}`}>
-                                  {testCase.status || 'skipped'}
-                                </span>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="text-xs text-gray-500 text-center py-2">
-                              No test cases found for this feature
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
+              {/* Test Cases Count */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-600">Test Cases:</span>
+                  <button
+                    onClick={handleTestCountClick}
+                    className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 hover:opacity-80 transition-opacity"
+                  >
+                    {nodeData.qualityMetrics?.testCount || 0} {showTestDetails ? '▼' : '▶'}
+                  </button>
                 </div>
-              )}
+                
+                {/* Test Cases List */}
+                {showTestDetails && (
+                  <div className="mt-2 space-y-2">
+                    {loadingTests ? (
+                      <div className="flex items-center justify-center py-4">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {testCases.length > 0 ? (
+                          testCases.map(testCase => (
+                            <div key={testCase.id} className="flex items-start justify-between text-xs bg-gray-50 p-2 rounded">
+                              <div className="flex-1">
+                                <a 
+                                  href={`https://choco.testops.cloud/project/1/test-cases/${testCase.id}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                                  title="View test case in Allure TestOps"
+                                >
+                                  {testCase.name}
+                                </a>
+                                <div className="text-gray-600 mt-1">{testCase.featureName}</div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-xs text-gray-500 text-center py-2">
+                            No test cases found for this feature
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
               
               {/* Last Updated */}
               {nodeData.qualityMetrics.lastUpdated && (

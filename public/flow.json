@@ -15,7 +15,6 @@
         "section": "section_account_team_management",
         "feature": "feature_user_login",
         "qualityMetrics": {
-          "testCoverage": 85,
           "bugCount": 2,
           "riskLevel": "medium",
           "lastUpdated": "2025-07-15T10:30:00Z"
@@ -37,7 +36,6 @@
         "section": "section_account_team_management",
         "feature": "feature_user_login",
         "qualityMetrics": {
-          "testCoverage": 78,
           "bugCount": 1,
           "riskLevel": "low",
           "lastUpdated": "2025-07-15T10:30:00Z"
@@ -59,7 +57,6 @@
         "section": "section_account_team_management",
         "feature": "feature_user_login",
         "qualityMetrics": {
-          "testCoverage": 92,
           "bugCount": 0,
           "riskLevel": "low",
           "lastUpdated": "2025-07-15T10:30:00Z"
@@ -81,7 +78,6 @@
         "section": "section_account_team_management",
         "feature": "feature_user_login",
         "qualityMetrics": {
-          "testCoverage": 88,
           "bugCount": 1,
           "riskLevel": "low",
           "lastUpdated": "2025-07-15T10:30:00Z"
@@ -103,7 +99,6 @@
         "section": "section_platform_features",
         "feature": "feature_buyer_chat",
         "qualityMetrics": {
-          "testCoverage": 95,
           "bugCount": 0,
           "riskLevel": "low",
           "lastUpdated": "2025-07-15T10:30:00Z"
@@ -125,7 +120,6 @@
         "section": "section_order_guide_management",
         "feature": "feature_order_guide",
         "qualityMetrics": {
-          "testCoverage": 72,
           "bugCount": 3,
           "riskLevel": "high",
           "lastUpdated": "2025-07-15T10:30:00Z"
@@ -147,7 +141,6 @@
         "section": "section_ordering",
         "feature": "feature_checkout_order_submission",
         "qualityMetrics": {
-          "testCoverage": 80,
           "bugCount": 2,
           "riskLevel": "medium",
           "lastUpdated": "2025-07-15T10:30:00Z"
@@ -169,7 +162,6 @@
         "section": "section_ordering",
         "feature": "feature_checkout_order_submission",
         "qualityMetrics": {
-          "testCoverage": 65,
           "bugCount": 4,
           "riskLevel": "high",
           "lastUpdated": "2025-07-15T10:30:00Z"
@@ -191,7 +183,6 @@
         "section": "section_ordering",
         "feature": "feature_checkout_order_submission",
         "qualityMetrics": {
-          "testCoverage": 90,
           "bugCount": 1,
           "riskLevel": "low",
           "lastUpdated": "2025-07-15T10:30:00Z"

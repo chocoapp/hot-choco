@@ -14,9 +14,9 @@ export interface QualityService {
   getQualityMetrics(product: string, section?: string, feature?: string): Promise<QualityMetrics>;
   
   /**
-   * Calculate risk level based on test coverage and bug count
+   * Calculate risk level based on bug count and test count
    */
-  calculateRiskLevel(testCoverage: number, bugCount: number): 'low' | 'medium' | 'high';
+  calculateRiskLevel(bugCount: number, testCount: number): 'low' | 'medium' | 'high';
   
   /**
    * Get quality metrics for multiple features
@@ -36,63 +36,58 @@ export class QualityServiceImpl implements QualityService {
   ) {}
 
   async getQualityMetrics(product: string, section?: string, feature?: string): Promise<QualityMetrics> {
-    // Get test coverage data
-    const testCoverage = await this.allureService.getTestCoverage(product, section, feature);
+    // Get test count from Allure TestOps
     const testStats = await this.allureService.getTestStats(product, section, feature);
+    const testCount = testStats?.total || 0;
     
-    // Get bug count
+    // Get bug count from Supabase
     const bugCount = await this.supabaseService.getBugCount(product, section, feature);
     
-    // Calculate risk level
-    const riskLevel = this.calculateRiskLevel(testCoverage?.coveragePercentage || 0, bugCount);
+    // Calculate risk level based on bugs and test count
+    const riskLevel = this.calculateRiskLevel(bugCount, testCount);
     
     return {
-      testCoverage: testCoverage?.coveragePercentage || 0,
       bugCount,
+      testCount,
       riskLevel,
-      lastUpdated: new Date().toISOString(),
-      testResults: testStats ? {
-        passed: testStats.passed,
-        failed: testStats.failed,
-        skipped: testStats.skipped,
-        total: testStats.total
-      } : {
-        passed: 0,
-        failed: 0,
-        skipped: 0,
-        total: 0
-      }
+      lastUpdated: new Date().toISOString()
     };
   }
 
-  calculateRiskLevel(testCoverage: number, bugCount: number): 'low' | 'medium' | 'high' {
-    // Risk calculation algorithm
+  calculateRiskLevel(bugCount: number, testCount: number): 'low' | 'medium' | 'high' {
+    // Enhanced risk calculation: Bug Risk (70%) + Test Coverage Risk (30%)
     let riskScore = 0;
     
-    // Test coverage contribution (40% of risk)
-    if (testCoverage < 60) {
-      riskScore += 40;
-    } else if (testCoverage < 80) {
-      riskScore += 20;
+    // Bug Risk Score (70% weight)
+    // Bug volume: min(bugCount * 3, 30) - capped at 30 points
+    const bugVolumeScore = Math.min(bugCount * 3, 30);
+    
+    // Severity-weighted score (will be enhanced when bug severity data is available)
+    // For now, assume medium severity: 6 points per bug
+    const severityScore = bugCount * 6;
+    
+    const bugRiskScore = bugVolumeScore + severityScore;
+    
+    // Test Coverage Risk (30% weight)
+    // Fewer tests = higher risk
+    let testCoverageRisk = 0;
+    if (testCount === 0) {
+      testCoverageRisk = 30;
+    } else if (testCount <= 5) {
+      testCoverageRisk = 20;
+    } else if (testCount <= 10) {
+      testCoverageRisk = 10;
     } else {
-      riskScore += 0;
+      testCoverageRisk = 0;
     }
     
-    // Bug count contribution (60% of risk)
-    if (bugCount === 0) {
-      riskScore += 0;
-    } else if (bugCount <= 2) {
-      riskScore += 20;
-    } else if (bugCount <= 5) {
-      riskScore += 40;
-    } else {
-      riskScore += 60;
-    }
+    // Combine scores
+    riskScore = (bugRiskScore * 0.7) + (testCoverageRisk * 0.3);
     
     // Classify risk level
     if (riskScore <= 20) {
       return 'low';
-    } else if (riskScore <= 50) {
+    } else if (riskScore <= 40) {
       return 'medium';
     } else {
       return 'high';

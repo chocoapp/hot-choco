@@ -175,22 +175,52 @@ This enables direct mapping to documentation, tests, and bug reports in external
 - ✅ **Production ready** with real-time quality metrics
 
 ### Development Guidelines
+**Recommended setup (Node 20 + pnpm):**
+```bash
+nvm use 20              # Switch to Node 20
+npm install -g pnpm     # Install pnpm
+pnpm install            # Install dependencies
+pnpm dev                # Start development server
+```
+
 **Always verify before committing:**
 ```bash
-npm run build    # Ensure production build succeeds
-npm run lint     # Check for linting errors
+pnpm build       # Ensure production build succeeds
+pnpm lint        # Check for linting errors
+npx tsc --noEmit # Check TypeScript compilation
 ```
-- Check TypeScript errors in IDE or run `tsc --noEmit`
 - Test the main `/graph` interface functionality
 - Verify Supabase and Allure TestOps connections are working
+- Check browser console for React warnings
+
+📖 **For detailed debugging and development guidance, see [DEVELOPMENT_GUIDE.md](./DEVELOPMENT_GUIDE.md)**
+
+## Key Features Implementation
+
+### Risk Overview Dashboard
+- **Feature-level risk calculation** (not screen-level)
+- **Real data integration**: Supabase bugs + Allure TestOps test counts
+- **Enhanced risk formula**: Bug severity weighting + test coverage gaps
+- **Comprehensive modals**: Detailed bug reports, test cases, and screen mapping
+
+### Data Architecture
+- **Multiple screens per feature**: One feature can span multiple user flow screens
+- **Unique React keys**: Proper key management prevents duplicate key errors
+- **Real-time data**: Live integration with Supabase vector DB and Allure TestOps
+
+### Debugging & Testing
+- **Playwright MCP integration**: Automated browser testing for verification
+- **TypeScript strict mode**: Prevents runtime errors from type mismatches
+- **Build verification**: Continuous integration ready
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+3. Make your changes following the [DEVELOPMENT_GUIDE.md](./DEVELOPMENT_GUIDE.md)
+4. Test with both real and mock data
+5. Verify build succeeds and no TypeScript errors
+6. Submit a pull request
 
 ## License
 
