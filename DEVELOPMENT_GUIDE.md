@@ -20,6 +20,31 @@ This guide documents key learnings from debugging and developing the Hot Choco r
 - **Feature grouping**: Multiple screens can legitimately belong to the same feature
 - **Risk calculation**: Group screens by feature, then calculate risk per feature
 
+### 4. **React State Management & Infinite Loops**
+- **Critical Issue**: `useEffect` with object dependencies can cause infinite re-renders
+- **Root Cause**: Functions that return new objects on every call trigger infinite re-renders
+- **Solution**: Use `useMemo` to memoize complex objects used in dependency arrays
+- **Example**: `const commonData = useMemo(() => getCommonData(), [deps])` instead of `const commonData = getCommonData()`
+- **Prevention**: Always check dependency arrays for objects that might change on every render
+
+### 5. **Error Handling Strategy for API Calls**
+- **Best Practice**: Wrap individual API calls in separate try-catch blocks rather than one global catch
+- **Benefit**: Partial failures don't break the entire component - users get available data with error warnings
+- **Implementation**: Each API call should have its own error handling and fallback values
+- **User Experience**: Show partial data with clear warnings rather than blank screens
+
+### 6. **Modal Component Architecture**
+- **Pattern**: Create unified components that handle multiple use cases rather than duplicating logic
+- **Context-Aware Design**: Use props to determine behavior (screen-level vs feature-level data)
+- **Data Source Flexibility**: Design components to accept different data sources (pre-loaded vs API-loaded)
+- **Consolidation Rule**: When components share >80% of functionality but have different data sources, consolidate them
+
+### 7. **TypeScript Interface Management**
+- **Validation**: Always check actual API responses against TypeScript interfaces
+- **Error Prevention**: Remove non-existent fields from interfaces to prevent runtime errors
+- **Example**: `TestStats` interface shouldn't include `broken` field if API doesn't provide it
+- **Best Practice**: Interface fields should match exactly what the API returns
+
 ## Development Environment Setup
 
 ### Prerequisites
@@ -43,6 +68,68 @@ pnpm dev
 ```
 
 **Note**: No need to install Playwright locally - use the Playwright MCP server for testing!
+
+## UI/UX Best Practices
+
+### 1. **Text Contrast & Readability**
+- **Avoid**: Light gray text on white backgrounds (`text-gray-500`)
+- **Use**: Darker colors like `text-gray-700` or `text-gray-800` for better readability
+- **Tab Design**: Active tabs should have distinct styling with proper background colors
+- **Status Indicators**: Only show status badges/indicators when you have real status data
+
+### 2. **Data Display Principles**
+- **Real Data Only**: Remove mock data displays when actual data isn't available
+- **Progressive Enhancement**: Show basic info first, then enhance with detailed calculations
+- **Conditional Rendering**: Use conditional rendering to avoid showing empty or fake data
+- **Example**: `{testCase.status && <StatusBadge />}` instead of showing "skipped" by default
+
+### 3. **Risk Calculation Transparency**
+- **User Value**: Users want to understand how risk scores are calculated
+- **Display Strategy**: Break down calculations into components (Bug Risk 50%, Test Coverage 40%, Complexity 10%)
+- **Context**: Show calculation breakdowns only where they make sense (feature-level, not screen-level)
+- **Format**: Show both weighted and raw scores for transparency
+
+## Testing Methodology
+
+### 1. **Critical Testing Approach**
+- **Always Test in Browser**: Build verification is not enough - test actual functionality
+- **Use Playwright**: Leverage the MCP Playwright server for functional testing
+- **Screenshot Verification**: Take screenshots to verify UI changes and user flows
+- **Test Both Modes**: Always test both feature-level and screen-level modals
+
+### 2. **Testing Process**
+1. **Start Development Server**: `npm run dev` or `npx next dev`
+2. **Navigate to Features**: Use Playwright to navigate and interact
+3. **Test User Flows**: Click through Risk Overview → View Details → All Tabs
+4. **Test Node Details**: Click flow nodes → View Detailed Analysis → All Tabs
+5. **Verify Data**: Ensure real data loads and fake data is hidden
+6. **Check Error Handling**: Test with API failures to ensure graceful degradation
+
+### 3. **Common Testing Patterns**
+```javascript
+// Navigate and test modal opening
+await playwright.navigate('http://localhost:3000/graph');
+await playwright.click('button:has-text("Risk Overview")');
+await playwright.click('button:has-text("View Details")');
+await playwright.screenshot('modal-opened');
+
+// Test all tabs
+await playwright.click('button:has-text("Tests")');
+await playwright.click('button:has-text("Bugs")');
+await playwright.click('button:has-text("Documentation")');
+```
+
+## Performance Optimization
+
+### 1. **API Loading Strategy**
+- **Conditional Loading**: Only load coverage/stats data when actually needed
+- **Parallel Loading**: Load test cases for both modes, but skip unnecessary API calls when data is already available
+- **Error Isolation**: Individual API failures shouldn't block other data from loading
+
+### 2. **State Management**
+- **State Reset**: Reset state properly when switching between different modal contexts
+- **Memoization**: Use `useMemo` for expensive calculations or object creation
+- **Dependency Management**: Carefully manage `useEffect` dependencies to avoid infinite loops
 
 ## Debugging Methodology
 
