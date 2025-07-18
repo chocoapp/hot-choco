@@ -4,6 +4,7 @@ import { getRiskLevelColor } from '../services/qualityService';
 import { supabaseService } from '../lib/supabase';
 import { allureService } from '../lib/services';
 import { BugReport } from '../services/supabaseService';
+import UnifiedDetailsModal from './UnifiedDetailsModal';
 
 interface RiskOverviewProps {
   nodes: FlowNodeData[];
@@ -21,155 +22,6 @@ interface FeatureRiskData {
   testCount: number;
 }
 
-interface FeatureDetailModalProps {
-  feature: FeatureRiskData | null;
-  onClose: () => void;
-}
-
-/**
- * Feature Detail Modal component
- */
-const FeatureDetailModal: React.FC<FeatureDetailModalProps> = ({ feature, onClose }) => {
-  if (!feature) return null;
-
-  const riskLevel = getRiskLevel(feature.riskScore);
-  const riskColors = getRiskLevelColor(riskLevel);
-
-  const getBugUrl = (source: string) => {
-    if (source && source.includes('-')) {
-      return `https://choco.atlassian.net/browse/${source}`;
-    }
-    return null;
-  };
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'critical': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">{feature.featureName}</h2>
-              <p className="text-sm text-gray-600">{feature.product} → {feature.section}</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <div className="text-3xl font-bold text-gray-900">{Math.round(feature.riskScore)}</div>
-                <div className="text-sm text-gray-500">Risk Score</div>
-              </div>
-              <span className={`px-3 py-1 text-sm font-medium rounded-full ${riskColors.background} ${riskColors.text}`}>
-                {riskLevel.toUpperCase()}
-              </span>
-              <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Open Bugs */}
-            <div className="border rounded-lg p-4">
-              <h3 className="text-lg font-semibold mb-3 text-red-600">Open Bugs ({feature.openBugs.length})</h3>
-              {feature.openBugs.length > 0 ? (
-                <div className="space-y-2">
-                  {feature.openBugs.map(bug => (
-                    <div key={bug.id} className="flex items-start justify-between p-2 bg-red-50 rounded">
-                      <div className="flex-1">
-                        {getBugUrl(bug.source || '') ? (
-                          <a 
-                            href={getBugUrl(bug.source || '')!} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 font-medium"
-                          >
-                            {bug.source}
-                          </a>
-                        ) : (
-                          <span className="font-medium">{bug.source || 'Unknown'}</span>
-                        )}
-                        <p className="text-sm text-gray-600 mt-1">{bug.description}</p>
-                      </div>
-                      <span className={`ml-2 px-2 py-1 rounded text-xs ${getSeverityColor(bug.severity)}`}>
-                        {bug.severity}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500">No open bugs</p>
-              )}
-            </div>
-
-            {/* Test Cases */}
-            <div className="border rounded-lg p-4">
-              <h3 className="text-lg font-semibold mb-3 text-blue-600">Test Cases ({feature.testCount})</h3>
-              <div className="text-sm text-gray-600">
-                {feature.testCount === 0 ? 'No tests found' : 
-                 feature.testCount <= 5 ? 'Low test coverage' : 
-                 feature.testCount <= 10 ? 'Medium test coverage' : 'Good test coverage'}
-              </div>
-            </div>
-          </div>
-
-          {/* Screens */}
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-3">Screens in this feature ({feature.screens.length})</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {feature.screens.map(screen => (
-                <div key={screen.label} className="p-3 bg-gray-50 rounded">
-                  <div className="font-medium">{screen.label}</div>
-                  <div className="text-sm text-gray-600">{screen.description}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Closed Bugs */}
-          {feature.closedBugs.length > 0 && (
-            <div className="mt-6 border rounded-lg p-4">
-              <h3 className="text-lg font-semibold mb-3 text-green-600">Recently Closed Bugs ({feature.closedBugs.length})</h3>
-              <div className="space-y-2">
-                {feature.closedBugs.slice(0, 5).map(bug => (
-                  <div key={bug.id} className="flex items-start justify-between p-2 bg-green-50 rounded">
-                    <div className="flex-1">
-                      {getBugUrl(bug.source || '') ? (
-                        <a 
-                          href={getBugUrl(bug.source || '')!} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 font-medium"
-                        >
-                          {bug.source}
-                        </a>
-                      ) : (
-                        <span className="font-medium">{bug.source || 'Unknown'}</span>
-                      )}
-                      <p className="text-sm text-gray-600 mt-1">{bug.description}</p>
-                    </div>
-                    <span className={`ml-2 px-2 py-1 rounded text-xs ${getSeverityColor(bug.severity)}`}>
-                      {bug.severity}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const getRiskLevel = (riskScore: number): 'low' | 'medium' | 'high' => {
   if (riskScore <= 20) return 'low';
@@ -403,9 +255,20 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ nodes }) => {
       </div>
       
       {/* Feature Detail Modal */}
-      <FeatureDetailModal 
-        feature={selectedFeature} 
-        onClose={() => setSelectedFeature(null)} 
+      <UnifiedDetailsModal 
+        isOpen={Boolean(selectedFeature)}
+        onClose={() => setSelectedFeature(null)}
+        featureData={selectedFeature ? {
+          featureName: selectedFeature.featureName,
+          product: selectedFeature.product,
+          section: selectedFeature.section,
+          feature: selectedFeature.featureName,
+          screens: selectedFeature.screens,
+          riskScore: selectedFeature.riskScore,
+          openBugs: selectedFeature.openBugs,
+          closedBugs: selectedFeature.closedBugs,
+          testCount: selectedFeature.testCount
+        } : null}
       />
     </div>
   );

@@ -21,9 +21,7 @@ import ProductFilter, { FilterOptions } from '../../components/ProductFilter';
 import RiskOverview from '../../components/RiskOverview';
 import { FlowData, FlowNode as FlowNodeType, FlowEdge, FlowNodeData } from '../../types/flow';
 import { getLayoutedElements } from '../../utils/layoutUtils';
-import { getRiskLevelNodeColor, QualityServiceImpl } from '../../services/qualityService';
-import { SupabaseServiceImpl } from '../../services/supabaseService';
-import { AllureServiceImpl } from '../../services/allureService';
+import { getRiskLevelNodeColor } from '../../services/qualityService';
 import { supabaseService } from '../../lib/supabase';
 import { allureService } from '../../lib/services';
 import { BugReport } from '../../services/supabaseService';
@@ -98,12 +96,12 @@ const GraphPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showRiskOverview, setShowRiskOverview] = useState(false);
   
-  // Initialize quality service
-  const qualityService = useMemo(() => {
-    const supabaseService = new SupabaseServiceImpl();
-    const allureService = new AllureServiceImpl();
-    return new QualityServiceImpl(supabaseService, allureService);
-  }, []);
+  // Initialize quality service (removed unused variable)
+  // const qualityService = useMemo(() => {
+  //   const supabaseService = new SupabaseServiceImpl();
+  //   const allureService = new AllureServiceImpl();
+  //   return new QualityServiceImpl(supabaseService, allureService);
+  // }, []);
   
   // Debug selectedNode changes
   useEffect(() => {

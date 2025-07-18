@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FlowNodeData } from '../types/flow';
 import { getRiskLevelColor } from '../services/qualityService';
-import DetailedViewModal from './DetailedViewModal';
+import UnifiedDetailsModal from './UnifiedDetailsModal';
 import { supabaseService } from '../lib/supabase';
 import { BugReport } from '../services/supabaseService';
 
@@ -366,7 +366,7 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
       </div>
 
       {/* Detailed View Modal */}
-      <DetailedViewModal
+      <UnifiedDetailsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         nodeData={nodeData}
