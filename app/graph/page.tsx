@@ -21,11 +21,68 @@ import ProductFilter, { FilterOptions } from '../../components/ProductFilter';
 import RiskOverview from '../../components/RiskOverview';
 import { FlowData, FlowNode as FlowNodeType, FlowEdge, FlowNodeData } from '../../types/flow';
 import { getLayoutedElements } from '../../utils/layoutUtils';
-import { getRiskLevelNodeColor } from '../../services/qualityService';
+import { getRiskLevelNodeColor, QualityServiceImpl } from '../../services/qualityService';
+import { SupabaseServiceImpl } from '../../services/supabaseService';
+import { AllureServiceImpl } from '../../services/allureService';
+import { supabaseService } from '../../lib/supabase';
+import { allureService } from '../../lib/services';
+import { BugReport } from '../../services/supabaseService';
 
 // Define custom node types outside component to prevent re-creation
 const nodeTypes = {
   circularNode: SimpleFlowNode,
+};
+
+// Helper functions for risk calculation with complexity factor
+const calculateRiskScore = (openBugs: BugReport[], testCount: number, screenCount: number = 1): number => {
+  // Bug Risk Score (60% weight - reduced from 70%)
+  const bugVolumeScore = Math.min(openBugs.length * 3, 30);
+  
+  // Severity-weighted score
+  const severityScore = openBugs.reduce((score, bug) => {
+    switch (bug.severity) {
+      case 'critical': return score + 20;
+      case 'high': return score + 12;
+      case 'medium': return score + 6;
+      case 'low': return score + 2;
+      default: return score + 6; // Default to medium
+    }
+  }, 0);
+
+  const bugRiskScore = bugVolumeScore + severityScore;
+
+  // Test Coverage Risk (25% weight - reduced from 30%)
+  let testCoverageRisk = 0;
+  if (testCount === 0) {
+    testCoverageRisk = 30;
+  } else if (testCount <= 5) {
+    testCoverageRisk = 20;
+  } else if (testCount <= 10) {
+    testCoverageRisk = 10;
+  } else {
+    testCoverageRisk = 0;
+  }
+
+  // Feature Complexity Risk (15% weight - new factor)
+  let complexityRisk = 0;
+  if (screenCount === 1) {
+    complexityRisk = 0;    // Single screen = no complexity penalty
+  } else if (screenCount <= 2) {
+    complexityRisk = 5;    // 2 screens = low complexity
+  } else if (screenCount <= 4) {
+    complexityRisk = 10;   // 3-4 screens = medium complexity
+  } else {
+    complexityRisk = 15;   // 5+ screens = high complexity
+  }
+
+  // Combined risk score: Bug Risk (50%) + Test Coverage Risk (40%) + Complexity Risk (10%)
+  return (bugRiskScore * 0.50) + (testCoverageRisk * 0.40) + (complexityRisk * 0.10);
+};
+
+const getRiskLevel = (riskScore: number): 'low' | 'medium' | 'high' => {
+  if (riskScore <= 20) return 'low';
+  if (riskScore <= 40) return 'medium';
+  return 'high';
 };
 
 /**
@@ -41,10 +98,75 @@ const GraphPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showRiskOverview, setShowRiskOverview] = useState(false);
   
+  // Initialize quality service
+  const qualityService = useMemo(() => {
+    const supabaseService = new SupabaseServiceImpl();
+    const allureService = new AllureServiceImpl();
+    return new QualityServiceImpl(supabaseService, allureService);
+  }, []);
+  
   // Debug selectedNode changes
   useEffect(() => {
     console.log('Selected node changed:', selectedNode);
   }, [selectedNode]);
+
+  // Calculate dynamic risk levels for nodes using the same logic as RiskOverview
+  const calculateDynamicRiskLevels = useCallback(async (nodes: FlowNodeType[]) => {
+    const updatedNodes = await Promise.all(nodes.map(async (node) => {
+      if (node.data.qualityMetrics && node.data.product && node.data.section && node.data.feature) {
+        try {
+          // Get real bug reports (not just count) from Supabase
+          const openBugs = await supabaseService.getBugReportsByStatus(
+            node.data.product, 
+            'open', 
+            node.data.section, 
+            node.data.feature
+          );
+          
+          // Get real test count from Allure TestOps
+          const testStats = await allureService.getTestStats(
+            node.data.product, 
+            node.data.section, 
+            node.data.feature
+          );
+          const testCount = testStats?.total || 0;
+          
+          // For individual screens, complexity is always 1 (since this is per-screen calculation)
+          const screenCount = 1;
+          const riskScore = calculateRiskScore(openBugs, testCount, screenCount);
+          const calculatedRiskLevel = getRiskLevel(riskScore);
+          
+          console.log(`Risk calculation for ${node.data.label}:`, {
+            openBugs: openBugs.length,
+            testCount,
+            screenCount,
+            riskScore,
+            calculatedRiskLevel,
+            originalRiskLevel: node.data.qualityMetrics.riskLevel
+          });
+          
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              qualityMetrics: {
+                bugCount: openBugs.length,
+                testCount: testCount,
+                riskLevel: calculatedRiskLevel,
+                lastUpdated: new Date().toISOString()
+              }
+            }
+          };
+        } catch (error) {
+          console.error(`Error calculating risk for ${node.data.label}:`, error);
+          // Fall back to original risk level from JSON if API calls fail
+          return node;
+        }
+      }
+      return node;
+    }));
+    return updatedNodes;
+  }, []);
 
   // Load flow data from JSON file
   useEffect(() => {
@@ -55,7 +177,14 @@ const GraphPage: React.FC = () => {
           throw new Error('Failed to load flow data');
         }
         const data: FlowData = await response.json();
-        setFlowData(data);
+        
+        // Calculate dynamic risk levels for all nodes
+        const nodesWithDynamicRisk = await calculateDynamicRiskLevels(data.nodes);
+        
+        setFlowData({
+          ...data,
+          nodes: nodesWithDynamicRisk
+        });
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
       } finally {
@@ -64,7 +193,7 @@ const GraphPage: React.FC = () => {
     };
 
     loadFlowData();
-  }, []);
+  }, [calculateDynamicRiskLevels]);
 
   // Filter nodes based on selected filters
   const filteredNodes = useMemo(() => {
@@ -205,9 +334,9 @@ const GraphPage: React.FC = () => {
   }
 
   return (
-    <div className="h-screen w-full">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b px-6 py-4">
+    <div className="h-screen w-full flex flex-col">
+      {/* Header - Fixed position */}
+      <div className="bg-white shadow-sm border-b px-6 py-4 flex-shrink-0 relative z-50">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">User Flow Visualization</h1>
@@ -251,7 +380,7 @@ const GraphPage: React.FC = () => {
 
       {/* Filters Panel */}
       {showFilters && (
-        <div className="px-6 pb-4">
+        <div className="px-6 pb-4 flex-shrink-0 bg-white border-b">
           <ProductFilter 
             nodes={allNodeData}
             onFilterChange={handleFilterChange}
@@ -261,13 +390,13 @@ const GraphPage: React.FC = () => {
 
       {/* Risk Overview Panel */}
       {showRiskOverview && (
-        <div className="px-6 pb-4">
+        <div className="px-6 pb-4 flex-shrink-0 bg-white border-b">
           <RiskOverview nodes={allNodeData} />
         </div>
       )}
 
-      {/* React Flow Graph */}
-      <div className="h-full relative">
+      {/* React Flow Graph - Takes remaining space */}
+      <div className="flex-1 relative">
         <ReactFlowProvider>
           <ReactFlow
             nodes={nodes}

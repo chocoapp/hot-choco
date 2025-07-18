@@ -4,8 +4,6 @@ import { getRiskLevelColor } from '../services/qualityService';
 import DetailedViewModal from './DetailedViewModal';
 import { supabaseService } from '../lib/supabase';
 import { BugReport } from '../services/supabaseService';
-import { allureService } from '../lib/services';
-import { TestCase } from '../services/allureService';
 
 interface NodeDetailsPanelProps {
   nodeData: FlowNodeData | null;
@@ -22,9 +20,6 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
   const [openBugs, setOpenBugs] = useState<BugReport[]>([]);
   const [closedBugs, setClosedBugs] = useState<BugReport[]>([]);
   const [loadingBugs, setLoadingBugs] = useState(false);
-  const [showTestDetails, setShowTestDetails] = useState(false);
-  const [testCases, setTestCases] = useState<TestCase[]>([]);
-  const [loadingTests, setLoadingTests] = useState(false);
   
   if (!nodeData) return null;
 
@@ -60,31 +55,6 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
     }
   };
 
-  const loadTestDetails = async () => {
-    if (!nodeData.feature) return;
-    
-    console.log('Loading test details for:', {
-      product: nodeData.product,
-      section: nodeData.section,
-      feature: nodeData.feature
-    });
-    
-    setLoadingTests(true);
-    try {
-      const testCasesData = await allureService.getTestCases(nodeData.product!, nodeData.section, nodeData.feature);
-      
-      console.log('Test cases result:', {
-        testCases: testCasesData.length,
-        testCasesData
-      });
-      
-      setTestCases(testCasesData);
-    } catch (error) {
-      console.error('Error loading test details:', error);
-    } finally {
-      setLoadingTests(false);
-    }
-  };
 
   const handleBugCountClick = () => {
     if (!showBugDetails) {
@@ -93,12 +63,6 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
     setShowBugDetails(!showBugDetails);
   };
 
-  const handleTestCountClick = () => {
-    if (!showTestDetails) {
-      loadTestDetails();
-    }
-    setShowTestDetails(!showTestDetails);
-  };
 
   const getBugUrl = (source: string) => {
     if (source && source.includes('-')) {
@@ -204,6 +168,24 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
             </ul>
           </div>
         )}
+
+        {/* Actions */}
+        <div>
+          <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+            <svg className="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Available Actions
+          </h4>
+          <ul className="space-y-1">
+            {nodeData.actions.map((action, index) => (
+              <li key={index} className="flex items-start text-sm text-gray-600">
+                <span className="text-blue-500 mr-2 mt-1">•</span>
+                {action}
+              </li>
+            ))}
+          </ul>
+        </div>
 
         {/* Product Hierarchy */}
         {(nodeData.product || nodeData.section || nodeData.feature) && (
@@ -361,55 +343,6 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
               )}
               
               
-              {/* Test Cases Count */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-600">Test Cases:</span>
-                  <button
-                    onClick={handleTestCountClick}
-                    className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 hover:opacity-80 transition-opacity"
-                  >
-                    {nodeData.qualityMetrics?.testCount || 0} {showTestDetails ? '▼' : '▶'}
-                  </button>
-                </div>
-                
-                {/* Test Cases List */}
-                {showTestDetails && (
-                  <div className="mt-2 space-y-2">
-                    {loadingTests ? (
-                      <div className="flex items-center justify-center py-4">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {testCases.length > 0 ? (
-                          testCases.map(testCase => (
-                            <div key={testCase.id} className="flex items-start justify-between text-xs bg-gray-50 p-2 rounded">
-                              <div className="flex-1">
-                                <a 
-                                  href={`https://choco.testops.cloud/project/1/test-cases/${testCase.id}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="font-medium text-blue-600 hover:text-blue-800 hover:underline"
-                                  title="View test case in Allure TestOps"
-                                >
-                                  {testCase.name}
-                                </a>
-                                <div className="text-gray-600 mt-1">{testCase.featureName}</div>
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="text-xs text-gray-500 text-center py-2">
-                            No test cases found for this feature
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-              
               {/* Last Updated */}
               {nodeData.qualityMetrics.lastUpdated && (
                 <div className="text-xs text-gray-500">
@@ -430,23 +363,6 @@ const NodeDetailsPanel: React.FC<NodeDetailsPanelProps> = ({ nodeData, onClose }
           </button>
         </div>
 
-        {/* Actions */}
-        <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
-            <svg className="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            Available Actions
-          </h4>
-          <ul className="space-y-1">
-            {nodeData.actions.map((action, index) => (
-              <li key={index} className="flex items-start text-sm text-gray-600">
-                <span className="text-blue-500 mr-2 mt-1">•</span>
-                {action}
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
 
       {/* Detailed View Modal */}

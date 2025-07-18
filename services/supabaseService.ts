@@ -657,3 +657,12 @@ export class MockSupabaseService implements SupabaseService {
     return newBug;
   }
 }
+
+// Default implementation - use RealSupabaseService for production
+export class SupabaseServiceImpl extends RealSupabaseService {
+  constructor() {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://default-url.supabase.co';
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    super(supabaseUrl, supabaseKey);
+  }
+}

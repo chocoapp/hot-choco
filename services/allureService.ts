@@ -6,12 +6,12 @@
 const FEATURE_MAPPING: Record<string, string> = {
   'feature_order_guide': 'Order Guide',
   'feature_user_login': 'Login',
-  'feature_checkout': 'Checkout & order submission',
+  'feature_checkout_order_submission': 'Checkout & order submission',
   'feature_catalog_browsing': 'Catalog',
-  'feature_chat': 'Chat screen',
+  'feature_buyer_chat': 'Chat Screen',
   'feature_order_details': 'Order Details',
   'feature_supplier_management': 'Supplier details',
-  'feature_invoice_management': 'Invoices',
+  'feature_invoices': 'Invoices',
   'feature_team_management': 'Admin roles and permissions',
   'feature_notifications': 'Notifications',
   'feature_delivery_check': 'Delivery Check'
@@ -502,3 +502,6 @@ export class MockAllureService implements AllureService {
     return newResults;
   }
 }
+
+// Default implementation - use RealAllureService for production
+export class AllureServiceImpl extends RealAllureService {}

@@ -222,8 +222,9 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ nodes }) => {
         const testStats = await allureService.getTestStats(firstScreen.product!, firstScreen.section, firstScreen.feature);
         const testCount = testStats?.total || 0;
 
-        // Calculate risk score
-        const riskScore = calculateRiskScore(openBugs, testCount);
+        // Calculate risk score with feature complexity (screen count)
+        const screenCount = screens.length;
+        const riskScore = calculateRiskScore(openBugs, testCount, screenCount);
 
         featureRiskData.push({
           featureId: key,
@@ -249,8 +250,8 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ nodes }) => {
     }
   };
 
-  const calculateRiskScore = (openBugs: BugReport[], testCount: number): number => {
-    // Bug Risk Score (70% weight)
+  const calculateRiskScore = (openBugs: BugReport[], testCount: number, screenCount: number = 1): number => {
+    // Bug Risk Score (60% weight - reduced from 70%)
     const bugVolumeScore = Math.min(openBugs.length * 3, 30);
     
     // Severity-weighted score
@@ -266,7 +267,7 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ nodes }) => {
 
     const bugRiskScore = bugVolumeScore + severityScore;
 
-    // Test Coverage Risk (30% weight)
+    // Test Coverage Risk (25% weight - reduced from 30%)
     let testCoverageRisk = 0;
     if (testCount === 0) {
       testCoverageRisk = 30;
@@ -278,8 +279,20 @@ const RiskOverview: React.FC<RiskOverviewProps> = ({ nodes }) => {
       testCoverageRisk = 0;
     }
 
-    // Combined risk score
-    return (bugRiskScore * 0.7) + (testCoverageRisk * 0.3);
+    // Feature Complexity Risk (15% weight - new factor)
+    let complexityRisk = 0;
+    if (screenCount === 1) {
+      complexityRisk = 0;    // Single screen = no complexity penalty
+    } else if (screenCount <= 2) {
+      complexityRisk = 5;    // 2 screens = low complexity
+    } else if (screenCount <= 4) {
+      complexityRisk = 10;   // 3-4 screens = medium complexity
+    } else {
+      complexityRisk = 15;   // 5+ screens = high complexity
+    }
+
+    // Combined risk score: Bug Risk (50%) + Test Coverage Risk (40%) + Complexity Risk (10%)
+    return (bugRiskScore * 0.50) + (testCoverageRisk * 0.40) + (complexityRisk * 0.10);
   };
 
 
